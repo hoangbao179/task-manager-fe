@@ -1,6 +1,6 @@
 import { FC, useState, createContext, useEffect } from 'react';
 import { ThemeProvider } from '@mui/material';
-import { themeCreator } from './base.ts';
+import { themeCreator } from './base';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import React from 'react';
