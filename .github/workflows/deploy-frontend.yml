@@ -49,6 +49,16 @@ jobs:
         chmod 600 ssh_key.pem
         ssh -t -o StrictHostKeyChecking=no -i ssh_key.pem ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << EOF
           cd /home/brian/task-manager
+
+          # Read the current Docker tag from .env
+          CURRENT_DOCKER_TAG=$(grep 'DOCKER_TAG_FRONTEND=' .env | cut -d '=' -f 2)
+          
+          # Remove old Docker image if it exists
+          if [ -n "$CURRENT_DOCKER_TAG" ]; then
+            docker-compose down
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/task-be:$CURRENT_DOCKER_TAG || true
+          fi
+
           if grep -q "^DOCKER_TAG_FRONTEND=" .env; then
             sed -i "/^DOCKER_TAG_FRONTEND=/c\DOCKER_TAG_FRONTEND=${DOCKER_TAG_FRONTEND}" .env
           else
