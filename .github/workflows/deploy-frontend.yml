@@ -56,7 +56,7 @@ jobs:
           # Remove old Docker image if it exists
           if [ -n "$CURRENT_DOCKER_TAG" ]; then
             docker-compose down
-            docker rmi ${{ secrets.DOCKER_USERNAME }}/task-be:$CURRENT_DOCKER_TAG || true
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/task-fe:$CURRENT_DOCKER_TAG || true
           fi
 
           if grep -q "^DOCKER_TAG_FRONTEND=" .env; then
