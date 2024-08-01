@@ -48,7 +48,13 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key.pem
         chmod 600 ssh_key.pem
         ssh -t -o StrictHostKeyChecking=no -i ssh_key.pem ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << EOF
-          echo -e "DOCKER_TAG_FRONTEND=${DOCKER_TAG_FRONTEND}" > .env
-          docker pull ${{ secrets.DOCKER_USERNAME }}/task-fe:${{ DOCKER_TAG_FRONTEND }}
-          docker-compose -f /home/brian/task-manager/docker-compose.yml up -d  # Use Docker Compose to start the services
+          cd /home/brian/task-manager
+          if grep -q "^DOCKER_TAG_FRONTEND=" .env; then
+            sed -i "/^DOCKER_TAG_FRONTEND=/c\DOCKER_TAG_FRONTEND=${DOCKER_TAG_FRONTEND}" .env
+          else
+            echo "DOCKER_TAG_FRONTEND=${DOCKER_TAG_FRONTEND}" >> .env
+          fi
+
+          docker-compose pull frontend
+          docker-compose up -d frontend
         EOF
