@@ -43,11 +43,12 @@ jobs:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         VPS_USER: ${{ secrets.VPS_USER }}
         VPS_IP: ${{ secrets.VPS_IP }}
-        DOCKER_TAG: ${{ github.sha }}
+        DOCKER_TAG_FRONTEND: ${{ github.sha }}
       run: |
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key.pem
         chmod 600 ssh_key.pem
         ssh -t -o StrictHostKeyChecking=no -i ssh_key.pem ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << EOF
-          docker pull ${{ secrets.DOCKER_USERNAME }}/task-fe:${{ DOCKER_TAG }}  # Pull the latest Docker image
+          echo -e "DOCKER_TAG_FRONTEND=${DOCKER_TAG_FRONTEND}" > .env
+          docker pull ${{ secrets.DOCKER_USERNAME }}/task-fe:${{ DOCKER_TAG_FRONTEND }}
           docker-compose -f /home/brian/task-manager/docker-compose.yml up -d  # Use Docker Compose to start the services
         EOF
