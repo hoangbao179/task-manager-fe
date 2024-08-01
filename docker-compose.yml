@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: ${DOCKER_USERNAME}/task-fe:latest
+    ports:
+      - "3000:3000"  
+    environment:
+      - NEXT_PUBLIC_API_URL=https://lenlichtrinh.info/api  
