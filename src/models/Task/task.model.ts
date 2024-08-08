@@ -24,3 +24,15 @@ export class Task implements ITask {
         this.dueDate = task.dueDate;
     }
 }
+
+
+export interface IRangeCalendarView {
+    startDate: string;
+    endDate: string;
+    minutesOffset: number;
+}
+
+export interface IDetailCalendarView {
+    id: string;
+    minutesOffset: number;
+}
