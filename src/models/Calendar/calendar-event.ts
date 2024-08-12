@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from "dayjs";
 import { IUser } from "../User/IUser";
-import { E_FormatDate } from "../../enum/E_FormatDate";
+import { E_FormatDate } from "../../enums/E_FormatDate";
 
 export interface ICalendarEvent {
     id?: string;

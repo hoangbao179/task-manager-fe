@@ -19,6 +19,18 @@ export const CustomDialogTitle = styled(DialogTitle)(
     `
 );
 
+export const CustomDialogDetailTitle = styled(DialogTitle)(
+    ({theme}) => `
+        display: flex;
+        justify-content: space-between;
+
+        ${theme.breakpoints.down('md')} {
+            flex-wrap: wrap;
+        }
+           
+    `
+);
+
 export const TitlePopup = styled(Grid)(
     ({theme}) => `
         display: flex;

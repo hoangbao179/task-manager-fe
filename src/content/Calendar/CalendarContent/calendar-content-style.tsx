@@ -181,6 +181,16 @@ export const DialogContentEvent = styled(DialogContent)(
     `
 );
 
+export const DialogContentDetailEvent = styled(DialogContent)(
+    ({  theme }) => `
+
+        ${theme.breakpoints.down('md')} {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+    `
+);
+
 export const ItemDetailWrapper = styled(Grid)<{isRichText?: boolean}>(
     ({isRichText}) => `
         display:  ${isRichText ? 'block' : 'flex'};

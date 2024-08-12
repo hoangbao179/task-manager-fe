@@ -1,10 +1,9 @@
 import { HttpStatusCode } from "axios";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Tab, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Typography } from "@mui/material";
 import { ButtonGroupWrapper, GridCalendarHeader } from "../PageHeader/page-header.style";
-import { BoxTabListCalender, DialogContentEvent, FullCalendarWrapper, TabListCalender, TabPanelGuest } from "./calendar-content-style";
+import { DialogContentDetailEvent, DialogContentEvent, FullCalendarWrapper, TabListCalender, TabPanelGuest } from "./calendar-content-style";
 import FullCalendar from '@fullcalendar/react';
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import { useRef } from "react";
@@ -16,12 +15,12 @@ import { FC } from "react";
 import { IRangeCalendarView } from "../../../models/Task/task.model";
 import { ISnackbarOption } from "../../../models/ISnackbarOption";
 import { DatesSetArg, EventInput } from "@fullcalendar/core";
-import { combineDateTimeUTC, convertEnumValueToLabel } from "../../../utils/helper/helper";
+import { combineDateTimeUTC } from "../../../utils/helper/helper";
 import { ModeEditOutline } from "@mui/icons-material";
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { TabContext, TabPanel } from "@mui/lab";
-import { CustomActions, CustomDialogTitle, TitlePopup } from "../../../components/Dialog/dialog.styles";
+import { CustomActions, CustomDialogDetailTitle } from "../../../components/Dialog/dialog.styles";
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -32,13 +31,11 @@ import { CalendarEventForm, ICalendarEventForm } from "../../../models/Calendar/
 import { CalendarEvent, IDetailCalendarView } from "../../../models/Calendar/calendar-event";
 import { CalendarEventService } from "../../../services/calendar/calendar.service";
 import { useForm } from "react-hook-form";
-import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import GroupsIcon from '@mui/icons-material/Groups';
 import AddEventCalendarPopup from "../AddEventCalendarPopup";
 import EventDetailPopupComponent from "../EventDetailPopup";
 import dayjs from "dayjs";
 import { stringify } from "querystring";
-import { E_FormatDate } from "../../../enum/E_FormatDate";
+import { E_FormatDate } from "../../../enums/E_FormatDate";
 export enum ECalendarMode {
     YEAR = 'multiMonthYear',
     MONTH = 'dayGridMonth',
@@ -52,8 +49,6 @@ export const TabManagement = {
 };
 
 const CalendarContent: FC<any> = (): JSX.Element => {
-    const router = useRouter();
-
     const formCalendarEvent = useForm<ICalendarEventForm>({ mode: 'all' });
     const calendarRef = useRef(null);
     const calendarApi = calendarRef.current?.getApi();
@@ -63,31 +58,14 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     const [ submitting, setSubmitting ] = useState(false);
     const [ currentEvent, setCurrentEvent ] = useState<CalendarEvent>(null);
     const [ showConfirmDeleteDialog, setShowConfirmDeleteDialog ] = useState(false);
-
     const [ isDoubleClick, setIsDoubleClick ] = useState(false);
     const [ rangeCalendarView, setRangeCalendarView ] = useState<IRangeCalendarView>();
     const [ events, setEvents ] = useState<CalendarEvent[]>();
     const [ snackbarOption, setSnackbarOption ] = useState<ISnackbarOption>({ open: false, type: 'success', messages: ''});
-
     const [showConfirmChangeTabDialog, setShowConfirmChangeTabDialog] = useState(false);
-
     const [ eventId, setEventId ] = useState<string>(null);
     const [ showConfirmDialog, setShowConfirmDialog ] = useState(false);
-
-    const [ keySearchGuest, setKeySearchGuest ] = useState('');
-    const [ showBtnClearText, setShowBtnClearText ] = useState(false);
     
-    useEffect(() => {
-        // getCurrentUserLogin();
-        // const eventAutoOpen = localStorage.getItem(NAVIGATE_CALENDAR_EVENT);
-        // if (eventAutoOpen || router.query?.id) {
-        //     getEventById(eventAutoOpen || router.query?.id as string);
-        //     onShowAddEventDetailDialog();
-        //     // localStorage.removeItem(NAVIGATE_CALENDAR_EVENT);
-        // }
-        setSubmitting(false);
-    }, [router.query]);
-
     useEffect(() => {
         getAllEvent(rangeCalendarView);
     }, [rangeCalendarView]);
@@ -629,13 +607,8 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                 open={showDetailEventDialog}
                 onClose={handleCloseDetailEvent}
             >
-                <CustomDialogTitle>
-                    <TitlePopup>
-                        {/* <ColorItem color={currentEvent?.color}></ColorItem> */}
-                        {currentEvent?.title}
-                    </TitlePopup>
-                    
-                    {/* {
+                <CustomDialogDetailTitle>
+                    {
                         checkPermissionAction() && 
                             <CustomActions>
                                 <IconButton
@@ -660,8 +633,8 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                                 </IconButton>
                             </CustomActions>
                     }
-                     */}
-                </CustomDialogTitle>
+                    
+                </CustomDialogDetailTitle>
 
                 <IconButton
                     aria-label="remove"
@@ -675,29 +648,16 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                     <CloseIcon />
                 </IconButton>
 
-                <DialogContentEvent>
+                <DialogContentDetailEvent>
                     <TabContext value={TabManagement.EventInfo}>
-                        {/* <BoxTabListCalender>
-                            <TabListCalender onChange={handleChangeTabDetail} aria-label="lab tab">
-                                <Tab 
-                                    icon={<EventAvailableIcon/>}
-                                    iconPosition='start'
-                                    label={convertEnumValueToLabel(TabManagement.EventInfo)}
-                                    value={TabManagement.EventInfo}
-                                />
-                            </TabListCalender>
-                        </BoxTabListCalender> */}
-                        {JSON.stringify(currentEvent)}s
                         <TabPanel value={TabManagement.EventInfo}>
                             <EventDetailPopupComponent
                                 eventDetail={currentEvent}
                             />
                         </TabPanel>
-
-
                     </TabContext>
-                    
-                </DialogContentEvent>
+      
+                </DialogContentDetailEvent>
 
                 <DialogActions></DialogActions>
             </Dialog >
