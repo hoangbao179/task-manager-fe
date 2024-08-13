@@ -653,7 +653,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                     <Grid
                         container
                         flexDirection="row"
-                        justifyContent="start"
+                        justifyContent="center"
                         spacing={2}>
                         <Grid item>
                             <OkButtonDialog
