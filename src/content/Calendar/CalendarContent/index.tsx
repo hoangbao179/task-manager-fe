@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Typography } from "@mui/material";
 import { ButtonGroupWrapper, GridCalendarHeader } from "../PageHeader/page-header.style";
-import { DialogContentDetailEvent, DialogContentEvent, FullCalendarWrapper } from "./calendar-content-style";
+import { BoxButton, DialogContentDetailEvent, DialogContentEvent, FullCalendarWrapper } from "./calendar-content-style";
 import FullCalendar from '@fullcalendar/react';
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import { useRef } from "react";
 import { Alert } from "@mui/material";
 import { Snackbar } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import { FC } from "react";
 import { IRangeCalendarView } from "../../../models/Task/task.model";
@@ -35,6 +36,8 @@ import AddEventCalendarPopup from "../AddEventCalendarPopup";
 import EventDetailPopupComponent from "../EventDetailPopup";
 import dayjs from "dayjs";
 import { E_FormatDate } from "../../../enums/E_FormatDate";
+import LoginDialog from "../../../components/Dialog/LoginDialog";
+import SignUpDialog from "../../../components/Dialog/SignUpDialog";
 export enum ECalendarMode {
     YEAR = 'multiMonthYear',
     MONTH = 'dayGridMonth',
@@ -62,7 +65,9 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     const [ snackbarOption, setSnackbarOption ] = useState<ISnackbarOption>({ open: false, type: 'success', messages: ''});
     const [showConfirmChangeTabDialog, setShowConfirmChangeTabDialog] = useState(false);
     const [ showConfirmDialog, setShowConfirmDialog ] = useState(false);
-    
+    const [isLoginDialogOpen, setLoginDialogOpen] = useState(false);
+    const [isSignUpDialogOpen, setSignUpDialogOpen] = useState(false);
+
     useEffect(() => {
         getAllEvent(rangeCalendarView);
     }, [rangeCalendarView]);
@@ -99,6 +104,18 @@ const CalendarContent: FC<any> = (): JSX.Element => {
         setShowDetailEventDialog(true);
     };
     
+const handleOpenSignUp = () => {
+    setSignUpDialogOpen(true);
+    setLoginDialogOpen(false);
+  };
+  
+  const handleOpenLogin = () => {
+    setLoginDialogOpen(true);
+    setSignUpDialogOpen(false);
+  };
+  
+
+
     const onShowDialogAddEvent = (data?: DateClickArg): void => {
         onShowAddEventDialog();
 
@@ -421,7 +438,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                                 Calendar
                     </Typography>
                 </Box>
-
+                <BoxButton>
                 {
                     checkPermissionAction() &&
                             <Box>
@@ -437,6 +454,20 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                                 </ButtonGroupWrapper>
                             </Box>
                 }
+                {               <Box>
+                                <ButtonGroupWrapper variant="outlined">
+                                    <Button
+                                        onClick={() => handleOpenLogin()}
+                                        color='secondary'
+                                        startIcon={<AccountCircleIcon />}
+                                        variant="contained"
+                                    >
+                                        <Typography>Login</Typography>
+                                    </Button>
+                                </ButtonGroupWrapper>
+                            </Box>}
+                </BoxButton>
+      
 
             </GridCalendarHeader>
 
@@ -790,6 +821,17 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                     </Grid>
                 </DialogActions>
             </Dialog>
+            <LoginDialog
+            open={isLoginDialogOpen}
+            onClose={() => setLoginDialogOpen(false)}
+            onSwitchToSignUp={handleOpenSignUp}
+                />
+
+            <SignUpDialog
+            open={isSignUpDialogOpen}
+            onClose={() => setSignUpDialogOpen(false)}
+            onSwitchToLogin={handleOpenLogin}
+            />
                 
             <Snackbar 
                 open={snackbarOption.open}
