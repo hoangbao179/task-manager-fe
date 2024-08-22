@@ -5,8 +5,8 @@ import { Scrollbars } from 'react-custom-scrollbars-2';
 import { Box, useTheme } from '@mui/material';
 
 interface ScrollbarProps {
-  className?: string;
-  children?: ReactNode;
+    className?: string;
+    children?: ReactNode;
 }
 
 const Scrollbar: FC<ScrollbarProps> = ({ className, children, ...rest }) => {

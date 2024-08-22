@@ -24,7 +24,7 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
   const handleLogin = async () => {
     try {
       const response = await AuthService.login(email, password);
-      localStorage.setItem('token', response.data?.token); 
+      localStorage.setItem('token', response.data?.token);
       alert('Login successful!');
       onClose();
     } catch (error) {

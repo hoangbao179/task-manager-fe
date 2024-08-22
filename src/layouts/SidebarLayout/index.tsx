@@ -1,6 +1,6 @@
 import { Box, useTheme } from '@mui/material';
 import PropTypes from 'prop-types';
-import { FC, ReactNode, useContext, useEffect, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 
 import {
     Alert,
@@ -11,9 +11,6 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 
 import CloseIcon from '@mui/icons-material/Close';
-import { HttpStatusCode } from 'axios';
-import { useRouter } from 'next/router';
-import SubLayout from './SubLayout';
 import { ISnackbarOption } from '../../models/ISnackbarOption';
 import LoadingSectionComponent from '../../components/LoadingSection';
 
@@ -23,32 +20,12 @@ interface SidebarLayoutProps {
 
 const SidebarLayout: FC<SidebarLayoutProps> = ({ children }) => {
     const theme = useTheme();
-    const router = useRouter();
-    
-
-
-
     const [ isSubmitting, setIsSubmitting] = useState<boolean>();
-    const [ isHandlingSeeMore, setIsHandlingSeeMore] = useState<boolean>();
-    const [ isHandlingSeeMoreInbox, setIsHandlingSeeMoreInbox] = useState<boolean>();
     const [ snackbarOption, setSnackbarOption ] = useState<ISnackbarOption>({
         open: false,
         type: 'success',
         messages: '',
     });
-
-
-    useEffect(() => {
-        setDataTypeSubLayout();
-    }, [router.query.id]);
-
-
-
-
-
-
-
-
 
     const handleCloseSnackbar = (): void => {
         setSnackbarOption({
@@ -58,32 +35,14 @@ const SidebarLayout: FC<SidebarLayoutProps> = ({ children }) => {
         });
     };
 
-
-
-    const onShowNavigateInBox = (id?: string): void => {
-        const param = id !== undefined ? '?id='+id : '';
-        router.push(`/management/library/inbox${param}`);
-    };
-
-
-
-    const redirectToInboxPage = (): void => {
-        onShowNavigateInBox();
-    };
-
     const getLayoutBody = (): JSX.Element => {
-
         return <Box display="block" paddingX={{xs: '15px', md:3}} width="100%">{children}</Box>;
     };
 
     return (
         <>
             <Header
-                isHandlingSeeMore={isHandlingSeeMore}
-                setIsSubmitting={setIsSubmitting}
-                setSnackbarOption={setSnackbarOption}
-                redirectToInboxPage={redirectToInboxPage} 
-                isHandlingSeeMoreInbox={false}            />
+                setSnackbarOption={setSnackbarOption}          />
             <Sidebar />
             <Box
                 sx={{
@@ -137,13 +96,8 @@ const SidebarLayout: FC<SidebarLayoutProps> = ({ children }) => {
     );
 };
     
-
 SidebarLayout.propTypes = {
     children: PropTypes.node
 };
 
 export default SidebarLayout;
-function setDataTypeSubLayout() {
-    throw new Error('Function not implemented.');
-}
-

@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { LabelWrapper } from './label.styles';
 
 interface LabelProps {
-  className?: string;
-  color?:
+    className?: string;
+    color?:
     | 'primary'
     | 'black'
     | 'secondary'
@@ -12,10 +12,8 @@ interface LabelProps {
     | 'warning'
     | 'success'
     | 'info';
-  children?: ReactNode;
+    children?: ReactNode;
 }
-
-
 
 const Label: FC<LabelProps> = ({
     className,

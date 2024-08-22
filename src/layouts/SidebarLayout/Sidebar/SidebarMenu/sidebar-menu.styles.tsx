@@ -187,3 +187,19 @@ export const GroupIcons = styled(Box)(
         }
     `
 );
+export const QuickLinkIcon = styled(Box)(
+    ({ }) => `
+        display: inline-flex;
+        justify-content: center;
+        text-align: center;
+        font-weight: bold;
+
+        svg {
+            font-size: 30px;
+        }
+
+        img {
+            object-fit: contain !important;
+        }
+    `
+);

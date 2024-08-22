@@ -1,9 +1,6 @@
-
 import { Divider, useMediaQuery, useTheme } from '@mui/material';
-
 import SidebarMenu from './SidebarMenu';
 import { useContext, useLayoutEffect } from 'react';
-import ExpandMenu from './ExpandMenu';
 import { CustomDrawer, SidebarWrapper } from './sidebar.styles';
 import { SidebarContext } from '../../../contexts/SidebarContext';
 import Scrollbar from '../../../components/Scrollbar';
@@ -38,8 +35,7 @@ function Sidebar(): JSX.Element {
                         theme.palette.mode === 'dark' ? theme.sidebar.boxShadow : 'none'
                 }}
             >
-                <SidebarMenu/>
-                <ExpandMenu/>
+                <SidebarMenu />
             </SidebarWrapper>
 
             <CustomDrawer
@@ -64,8 +60,6 @@ function Sidebar(): JSX.Element {
                     </Scrollbar>
                 </SidebarWrapper>
             </CustomDrawer>
-
-
         </>
     );
 }
