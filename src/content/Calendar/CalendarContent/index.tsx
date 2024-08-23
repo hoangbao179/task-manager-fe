@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Typography } from "@mui/material";
 import { ButtonGroupWrapper, GridCalendarHeader } from "../PageHeader/page-header.style";
-import { DialogContentDetailEvent, DialogContentEvent, FullCalendarWrapper } from "./calendar-content-style";
+import { BoxButton, DialogContentDetailEvent, DialogContentEvent, FullCalendarWrapper } from "./calendar-content-style";
 import FullCalendar from '@fullcalendar/react';
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import { useRef } from "react";
@@ -51,18 +51,18 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     const formCalendarEvent = useForm<ICalendarEventForm>({ mode: 'all' });
     const calendarRef = useRef(null);
     const calendarApi = calendarRef.current?.getApi();
-    const [ showAddEventDialog, setShowAddEventDialog ] = useState(false);
-    const [ showDetailEventDialog, setShowDetailEventDialog ] = useState(false);
-    const [ submitting, setSubmitting ] = useState(false);
-    const [ currentEvent, setCurrentEvent ] = useState<CalendarEvent>(null);
-    const [ showConfirmDeleteDialog, setShowConfirmDeleteDialog ] = useState(false);
-    const [ isDoubleClick, setIsDoubleClick ] = useState(false);
-    const [ rangeCalendarView, setRangeCalendarView ] = useState<IRangeCalendarView>();
-    const [ events, setEvents ] = useState<CalendarEvent[]>();
-    const [ snackbarOption, setSnackbarOption ] = useState<ISnackbarOption>({ open: false, type: 'success', messages: ''});
+    const [showAddEventDialog, setShowAddEventDialog] = useState(false);
+    const [showDetailEventDialog, setShowDetailEventDialog] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [currentEvent, setCurrentEvent] = useState<CalendarEvent>(null);
+    const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
+    const [isDoubleClick, setIsDoubleClick] = useState(false);
+    const [rangeCalendarView, setRangeCalendarView] = useState<IRangeCalendarView>();
+    const [events, setEvents] = useState<CalendarEvent[]>();
+    const [snackbarOption, setSnackbarOption] = useState<ISnackbarOption>({ open: false, type: 'success', messages: '' });
     const [showConfirmChangeTabDialog, setShowConfirmChangeTabDialog] = useState(false);
-    const [ showConfirmDialog, setShowConfirmDialog ] = useState(false);
-    
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
     useEffect(() => {
         getAllEvent(rangeCalendarView);
     }, [rangeCalendarView]);
@@ -80,14 +80,13 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                 });
             });
         }
-        else if(events && events.length === 0 && calendarApi){
+        else if (events && events.length === 0 && calendarApi) {
             calendarApi.batchRendering(() => {
                 // Clear all event
                 calendarApi?.removeAllEventSources();
                 calendarApi?.removeAllEvents();
             });
         }
-        
     }, [events]);
 
     const onShowAddEventDialog = (): void => {
@@ -98,7 +97,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     const onShowAddEventDetailDialog = (): void => {
         setShowDetailEventDialog(true);
     };
-    
+
     const onShowDialogAddEvent = (data?: DateClickArg): void => {
         onShowAddEventDialog();
 
@@ -119,11 +118,11 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                         endTime: dayjs(time),
                         isSetTimeModeWeek: isSetTimeModeWeek
                     });
-                } 
+                }
                 else {
                     setCurrentEvent(calendarEvent);
                 }
-            } 
+            }
             else {
                 setCurrentEvent(calendarEvent);
             }
@@ -179,7 +178,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                 })
                 .catch(() => {
                     setSnackbarOption({
-                        open: true, 
+                        open: true,
                         type: 'error',
                         messages: MSG_ERROR_COMMON
                     });
@@ -187,7 +186,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                 .finally(() => {
                     setSubmitting(false);
                 });
-        } 
+        }
         else {
             CalendarEventService.createCalendarEvent(param)
                 .then(result => {
@@ -195,7 +194,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                         if (showConfirmChangeTabDialog) {
                             setShowConfirmChangeTabDialog(false);
                             clearForm();
-                        } 
+                        }
                         else {
                             setShowAddEventDialog(false);
                         }
@@ -211,7 +210,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                 })
                 .catch(() => {
                     setSnackbarOption({
-                        open: true, 
+                        open: true,
                         type: 'error',
                         messages: MSG_ERROR_COMMON
                     });
@@ -227,13 +226,13 @@ const CalendarContent: FC<any> = (): JSX.Element => {
             const dateRange: IRangeCalendarView = {
                 startDate: moment(date?.startStr).format('yyyy-MM-DD'),
                 endDate: moment(date?.endStr).format('yyyy-MM-DD'),
-                minutesOffset:(new Date()).getTimezoneOffset()
+                minutesOffset: (new Date()).getTimezoneOffset()
             };
-    
+
             if (moment(dateRange?.startDate).isSame(rangeCalendarView?.startDate) && moment(dateRange?.endDate).isSame(rangeCalendarView?.endDate)) {
                 return;
             }
-    
+
             setRangeCalendarView(dateRange);
         }, 0);
     };
@@ -258,8 +257,8 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                     res.data.endDate = dayjs(combineDateTimeUTC(res.data.endDate, res.data.endTime, res.data.isAllDay)).format('YYYY-MM-DD');
                     res.data.startTime = dayjs(combineDateTimeUTC(res.data.startDate, res.data.startTime, res.data.isAllDay)).format('HH:mm:ss');
                     res.data.endTime = dayjs(combineDateTimeUTC(res.data.endDate, res.data.endTime, res.data.isAllDay)).format('HH:mm:ss');
-                    res.data.startTimeString = dayjs.isDayjs(res.data?.startTime) ? dayjs(res.data?.startTime).format(E_FormatDate.TimeEvent) :  dayjs(new Date(`${res.data.startDate} ${res.data?.startTime}`)).format(E_FormatDate.TimeEvent);
-                    res.data.endDateTimeString = dayjs.isDayjs(res.data?.endTime) ? dayjs(res.data?.endTime).format(E_FormatDate.TimeEvent) :  dayjs(new Date(`${res.data.endDate} ${res.data?.endTime}`)).format(E_FormatDate.TimeEvent);
+                    res.data.startTimeString = dayjs.isDayjs(res.data?.startTime) ? dayjs(res.data?.startTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${res.data.startDate} ${res.data?.startTime}`)).format(E_FormatDate.TimeEvent);
+                    res.data.endDateTimeString = dayjs.isDayjs(res.data?.endTime) ? dayjs(res.data?.endTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${res.data.endDate} ${res.data?.endTime}`)).format(E_FormatDate.TimeEvent);
                     setCurrentEvent(res.data);
                     setCurrentEvent(res.data);
                 };
@@ -291,7 +290,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
         }));
     };
 
-    const onRemoveEvent= (_: string): void => {
+    const onRemoveEvent = (_: string): void => {
         setShowConfirmDeleteDialog(true);
     };
 
@@ -317,7 +316,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
             })
             .catch(() => {
                 setSnackbarOption({
-                    open: true, 
+                    open: true,
                     type: 'error',
                     messages: MSG_ERROR_COMMON
                 });
@@ -332,7 +331,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
         const end = combineDateTimeUTC(data.endDate, null, data.isAllDay).toString();
         var startDate = new Date(start);
         var endDate = new Date(end);
-        if( data.isAllDay && endDate.getDate() != startDate.getDate()){
+        if (data.isAllDay && endDate.getDate() != startDate.getDate()) {
             endDate.setDate(endDate.getDate() + 1);
         }
         const newEvent: EventInput = {
@@ -347,7 +346,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
         };
         return newEvent;
     };
-    
+
     const handleCloseSnackbar = (): void => {
         setSnackbarOption({
             ...snackbarOption,
@@ -364,16 +363,16 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     };
 
     const dayClickCallback = (data: DateClickArg): void => {
-        if(!checkPermissionAction()) {
+        if (!checkPermissionAction()) {
             return;
         }
         clearForm();
 
-        if(isDoubleClick) {
+        if (isDoubleClick) {
             onShowDialogAddEvent(data);
             setIsDoubleClick(false);
         }
-        else{
+        else {
             setIsDoubleClick(true);
             setTimeout(() => {
                 setIsDoubleClick(false);
@@ -382,8 +381,8 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     };
 
     const getTitle = (): string => {
-        if(checkPermissionAction()) {
-            if(currentEvent?.id ){
+        if (checkPermissionAction()) {
+            if (currentEvent?.id) {
                 return 'Edit Event';
             }
             return 'Add Event';
@@ -418,25 +417,27 @@ const CalendarContent: FC<any> = (): JSX.Element => {
             <GridCalendarHeader xs={12}>
                 <Box>
                     <Typography className="title-calendar">
-                                Calendar
+                        Calendar
                     </Typography>
                 </Box>
+                <BoxButton>
+                    {
+                        checkPermissionAction() &&
+                        <Box>
+                            <ButtonGroupWrapper variant="outlined">
+                                <Button
+                                    onClick={() => onShowDialogAddEvent()}
+                                    color='secondary'
+                                    startIcon={<AddIcon />}
+                                    variant="contained"
+                                >
+                                    <Typography>Add Event</Typography>
+                                </Button>
+                            </ButtonGroupWrapper>
+                        </Box>
+                    }
+                </BoxButton>
 
-                {
-                    checkPermissionAction() &&
-                            <Box>
-                                <ButtonGroupWrapper variant="outlined">
-                                    <Button
-                                        onClick={() => onShowDialogAddEvent()}
-                                        color='secondary'
-                                        startIcon={<AddIcon />}
-                                        variant="contained"
-                                    >
-                                        <Typography>Add Event</Typography>
-                                    </Button>
-                                </ButtonGroupWrapper>
-                            </Box>
-                }
 
             </GridCalendarHeader>
 
@@ -469,7 +470,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                     }}
                     timeZone={'local'}
                     datesSet={(date) => getDateSetDefault(date)}
-                    eventClick={(data) => {getEventById(data.event.id); onShowAddEventDetailDialog();}}
+                    eventClick={(data) => { getEventById(data.event.id); onShowAddEventDetailDialog(); }}
                     dateClick={(data) => dayClickCallback(data)}
                     views={{
                         timeGridWeek: {
@@ -480,15 +481,15 @@ const CalendarContent: FC<any> = (): JSX.Element => {
             </FullCalendarWrapper>
 
             <Dialog
-                fullScreen={false} 
+                fullScreen={false}
                 fullWidth={true}
                 maxWidth="md"
                 open={showAddEventDialog}
                 onClose={onClose}
             >
                 <DialogTitle>
-                    { 
-                        getTitle()  
+                    {
+                        getTitle()
                     }
                 </DialogTitle>
                 <IconButton
@@ -516,7 +517,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
 
                 <DialogActions>
                     {
-                        checkPermissionAction() ? 
+                        checkPermissionAction() ?
                             <Grid
                                 container
                                 flexDirection="row"
@@ -540,7 +541,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                                         Cancel
                                     </CancelButtonDialog>
                                 </Grid>
-                            </Grid> 
+                            </Grid>
                             : <Grid
                                 container
                                 flexDirection="row"
@@ -555,45 +556,44 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                                         OK
                                     </OkButtonDialog>
                                 </Grid>
-                            </Grid> 
+                            </Grid>
                     }
-                
+
                 </DialogActions>
             </Dialog >
 
             <Dialog
-                fullScreen={false} 
+                fullScreen={false}
                 fullWidth={true}
                 open={showDetailEventDialog}
                 onClose={handleCloseDetailEvent}
             >
                 <CustomDialogDetailTitle>
                     {
-                        checkPermissionAction() && 
-                            <CustomActions>
-                                <IconButton
-                                    aria-label="edit"
-                                    onClick={() => {onEditEvent(currentEvent?.id);}}
-                                >
-                                    <ModeEditOutline fontSize="small"></ModeEditOutline>
-                                </IconButton>
+                        <CustomActions>
+                            <IconButton
+                                aria-label="edit"
+                                onClick={() => { onEditEvent(currentEvent?.id); }}
+                            >
+                                <ModeEditOutline fontSize="small"></ModeEditOutline>
+                            </IconButton>
 
-                                <IconButton
-                                    aria-label="copy"
-                                    onClick={() => {onCopyEvent(currentEvent?.id);}}
-                                >
-                                    <ContentCopyOutlinedIcon fontSize="small"></ContentCopyOutlinedIcon>
-                                </IconButton>
-                                
-                                <IconButton
-                                    aria-label="remove"
-                                    onClick={() => {onRemoveEvent(currentEvent?.id);}}
-                                >
-                                    <DeleteOutlineOutlinedIcon fontSize="small"></DeleteOutlineOutlinedIcon>
-                                </IconButton>
-                            </CustomActions>
+                            <IconButton
+                                aria-label="copy"
+                                onClick={() => { onCopyEvent(currentEvent?.id); }}
+                            >
+                                <ContentCopyOutlinedIcon fontSize="small"></ContentCopyOutlinedIcon>
+                            </IconButton>
+
+                            <IconButton
+                                aria-label="remove"
+                                onClick={() => { onRemoveEvent(currentEvent?.id); }}
+                            >
+                                <DeleteOutlineOutlinedIcon fontSize="small"></DeleteOutlineOutlinedIcon>
+                            </IconButton>
+                        </CustomActions>
                     }
-                    
+
                 </CustomDialogDetailTitle>
 
                 <IconButton
@@ -616,7 +616,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                             />
                         </TabPanel>
                     </TabContext>
-      
+
                 </DialogContentDetailEvent>
 
                 <DialogActions></DialogActions>
@@ -700,10 +700,10 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                 >
                     <CloseIcon />
                 </IconButton>
-                
+
                 <DialogContent>
                     <DialogContentText>
-                            Save before closing?
+                        Save before closing?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -719,7 +719,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                                 color="secondary"
                                 variant="contained"
                             >
-                                    Yes
+                                Yes
                             </OkButtonDialog>
                         </Grid>
 
@@ -728,13 +728,13 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                                 onClick={handleCloseConfirm}
                                 variant="outlined"
                             >
-                                    No
+                                No
                             </CancelButtonDialog>
                         </Grid>
                     </Grid>
                 </DialogActions>
             </Dialog>
- 
+
 
             <Dialog
                 open={showConfirmChangeTabDialog}
@@ -742,7 +742,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle >
-                    Save First?           
+                    Save First?
                 </DialogTitle>
                 <IconButton
                     aria-label="close"
@@ -756,7 +756,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                 >
                     <CloseIcon />
                 </IconButton>
-                
+
                 <DialogContent>
                     <DialogContentText>
                         Save before changing tab?
@@ -775,7 +775,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                                 color="secondary"
                                 variant="contained"
                             >
-                                    Yes
+                                Yes
                             </OkButtonDialog>
                         </Grid>
 
@@ -790,24 +790,25 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                     </Grid>
                 </DialogActions>
             </Dialog>
-                
-            <Snackbar 
+
+
+            <Snackbar
                 open={snackbarOption.open}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 autoHideDuration={snackbarOption?.timeHidden || 2000}
                 onClose={handleCloseSnackbar}
                 security={snackbarOption.type}
             >
-                <Alert 
+                <Alert
                     onClose={handleCloseSnackbar}
-                    variant="filled" 
-                    severity={snackbarOption.type} 
+                    variant="filled"
+                    severity={snackbarOption.type}
                     sx={{ width: '100%' }}
                     action={
                         <IconButton
                             size="small"
                             aria-label="close"
-                            style={{color: 'white'}} 
+                            style={{ color: 'white' }}
                             onClick={handleCloseSnackbar}
                         >
                             <CloseIcon />
@@ -816,7 +817,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                     {snackbarOption.messages}
                 </Alert>
             </Snackbar>
-                        
+
             <LoadingSectionComponent
                 isLoading={false}
                 isShowBackdrop={true}>

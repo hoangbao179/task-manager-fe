@@ -209,6 +209,12 @@ export const LabelDetail = styled('strong')(
     `
 );
 
+export const BoxButton = styled(Box)(
+    ({}) => `
+        display: flex;
+    `
+);
+
 export const ColorItem = styled(Grid)<{color: string}>(
     ({theme, color}) => `
         display: flex;

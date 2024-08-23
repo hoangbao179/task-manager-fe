@@ -11,31 +11,31 @@ interface IIsLoadingProps {
     left?: boolean
 }
 
-const LoadingSectionComponent: FC<IIsLoadingProps> = ({isLoading, isShowBackdrop, isInSection, size = 40, pt = '20px', pb,left}): JSX.Element => {
+const LoadingSectionComponent: FC<IIsLoadingProps> = ({ isLoading, isShowBackdrop, isInSection, size = 40, pt = '20px', pb, left }): JSX.Element => {
     if (isLoading) {
         return (
-            isShowBackdrop ? 
+            isShowBackdrop ?
                 <Backdrop
-                    sx={{ 
+                    sx={{
                         position: isInSection ? 'absolute' : 'fixed',
-                        color: '#fff', 
+                        color: '#fff',
                         backgroundColor: 'rgb(0 7 52 / 50%)!important',
-                        zIndex: () => 999999 
+                        zIndex: () => 999999
                     }}
                     open={true}>
                     <Stack direction="row" justifyContent="center" pt={pt}>
-                        <CircularProgress color="inherit"/>
+                        <CircularProgress color="inherit" />
                     </Stack>
                 </Backdrop>
-                : 
-                <Stack 
-                    direction="row" 
+                :
+                <Stack
+                    direction="row"
                     alignItems="center"
                     justifyContent={left ? 'left' : 'center'}
-                    pt={pt} 
+                    pt={pt}
                     pb={pb}
                     height="100%">
-                    <CircularProgress size={size} color="inherit"/>
+                    <CircularProgress size={size} color="inherit" />
                 </Stack>
         );
     }
