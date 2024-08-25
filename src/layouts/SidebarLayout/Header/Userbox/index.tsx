@@ -4,11 +4,15 @@ import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
 import {
     ButtonAction,
     ButtonActions,
+    IconButtonWrapper,
     MenuUserBox,
     PopoverUser,
 } from './user-box.styles';
 import LoginDialog from '../../../../components/Dialog/LoginDialog';
 import SignUpDialog from '../../../../components/Dialog/SignUpDialog';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Button, Typography } from '@mui/material';
+import { ButtonGroupWrapper } from '../../../../content/Calendar/PageHeader/page-header.style';
 
 interface HeaderUserBoxProps {
     showConfirmChangeTabDialog: boolean;
@@ -47,7 +51,7 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
         <>
             {
                 <>
-                    {/* <ButtonGroupWrapper variant="outlined">
+                    <ButtonGroupWrapper variant="outlined">
                         <Button
                             onClick={() => handleOpenLogin()}
                             color='secondary'
@@ -58,8 +62,8 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
                         </Button>
                     </ButtonGroupWrapper>
                     <IconButtonWrapper color="primary" ref={ref} onClick={handleOpen}>
-                        <PersonIcon />
-                    </IconButtonWrapper> */}
+                        {/* <PersonIcon /> */}
+                    </IconButtonWrapper>
                     <PopoverUser
                         key='user-box'
                         anchorEl={ref.current}
