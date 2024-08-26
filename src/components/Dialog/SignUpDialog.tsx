@@ -8,6 +8,7 @@ import LoadingSectionComponent from '../LoadingSection';
 import CloseIcon from '@mui/icons-material/Close';
 import { ISnackbarOption } from '../../models/ISnackbarOption';
 import { MSG_ERROR_COMMON } from '../../constants/common';
+import { FormValidateConfig } from '../../utils/helper/helper';
 interface SignUpDialogProps {
   open: boolean;
   onClose: () => void;
@@ -18,18 +19,44 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLo
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [snackbarOption, setSnackbarOption] = useState<ISnackbarOption>({ open: false, type: 'success', messages: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!open) {
       setFullName('');
       setEmail('');
       setPassword('');
-      setError(null);
     }
   }, [open]);
   
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const emailValue = e.target.value;
+    setEmail(emailValue);
+    if (!FormValidateConfig.Pattern.Email.test(email)) {
+      setEmailError('Email not valid!');
+      return;
+    }
+    else {
+      setEmailError('');
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const passwordValue = e.target.value;
+    setPassword(passwordValue);
+
+    if (passwordValue.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+    } else {
+      setPasswordError('');
+    }
+  };
+
+
   const handleCloseSnackbar = (): void => {
     setSnackbarOption({
       ...snackbarOption,
@@ -37,12 +64,11 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLo
       messages: ''
     });
   };
+  
   const handleSignUp = async () => {
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    if (!!emailError || !!passwordError || !email || !password) {
       return;
     }
-
     try {
       await AuthService.signUp(fullName, email, password)
         .then((result) => {
@@ -74,7 +100,11 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLo
       onClose();
       onSwitchToLogin();
     } catch (error) {
-      setError('Registration failed! Please check your information again');
+      setSnackbarOption({
+        open: true,
+        type: 'error',
+        messages: 'Registration failed! Please check your information again'
+      });
     }
   };
 
@@ -82,7 +112,7 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLo
     <>
       <Dialog open={open} onClose={onClose}>
         <DialogTitle>Register</DialogTitle>
-        <DialogContent>
+        <DialogContent style={{width : '500px'}}>
           <TextField
             autoFocus
             margin="dense"
@@ -97,7 +127,11 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLo
             type="email"
             fullWidth
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
+            helperText={emailError}
+            FormHelperTextProps={{
+              style: { width: '300px', color: emailError ? 'red' : undefined },
+            }}
           />
           <TextField
             margin="dense"
@@ -105,12 +139,15 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLo
             type="password"
             fullWidth
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
+            helperText={passwordError}FormHelperTextProps={{
+              style: { width: '300px', color: passwordError ? 'red' : undefined },
+            }}
           />
         </DialogContent>
         <DialogActionsWrapper>
           <CancelButtonDialog onClick={onClose} variant="outlined">Cancel</CancelButtonDialog>
-          <OkButtonDialog onClick={handleSignUp} variant="outlined"><TypographyButton>Sign Up</TypographyButton></OkButtonDialog>
+          <OkButtonDialog onClick={handleSignUp} variant="outlined" disabled={!!emailError || !!passwordError || !email || !password}><TypographyButton>Sign Up</TypographyButton></OkButtonDialog>
         </DialogActionsWrapper>
         <div style={{ padding: '10px', textAlign: 'center' }}>
           <Button onClick={onSwitchToLogin}>Already have an account? Log in</Button>
