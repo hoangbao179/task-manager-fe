@@ -115,3 +115,9 @@ export const NoItemLabelWrapper = styled(Box)(
         padding: 20px 15px;
     `
 );
+
+export const ButtonLogin = styled(Button)(
+    ({ }) => `
+    padding: 20px 15px;
+`
+)

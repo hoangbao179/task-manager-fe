@@ -7,8 +7,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import LoadingSectionComponent from '../LoadingSection';
 import { ISnackbarOption } from '../../models/ISnackbarOption';
 import { HttpStatusCode } from 'axios';
-import { MSG_ERROR_COMMON } from '../../constants/common';
+import { CURRENT_USER, MSG_ERROR_COMMON } from '../../constants/common';
 import { FormValidateConfig } from '../../utils/helper/helper';
+import { UserService } from '../../services/user/user.service';
+import { AccountService } from '../../services/user/account.service';
 interface LoginDialogProps {
   open: boolean;
   onClose: () => void;
@@ -32,11 +34,10 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
     }
   }, [open]);
 
-
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const emailValue = e.target.value;
     setEmail(emailValue);
-    if (!FormValidateConfig.Pattern.Email.test(email)) {
+    if (!FormValidateConfig.Pattern.Email.test(emailValue)) {
       setEmailError('Email not valid!');
       return;
     }
@@ -54,6 +55,14 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
     setPasswordError(null);
   };
 
+  const getCurrentUser = async () => {
+    AccountService.getCurrentUser().then((result) => {
+      if (result.statusCode === HttpStatusCode.Ok) {
+        localStorage.setItem(CURRENT_USER, JSON.stringify(result.data));
+      }
+    });
+  }
+
   const handleLogin = async () => {
     if (!!emailError || !!passwordError || !email || !password) {
       return;
@@ -63,6 +72,7 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
         if (result.statusCode === HttpStatusCode.Ok) {
           localStorage.setItem('token', result.data?.token);
           onClose();
+          getCurrentUser();
           setSnackbarOption({
             open: true,
             type: 'success',

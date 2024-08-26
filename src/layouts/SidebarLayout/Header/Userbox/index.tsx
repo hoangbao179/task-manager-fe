@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from 'react';
+import { FC, useContext, useRef, useState } from 'react';
 import KeyIcon from '@mui/icons-material/Key';
 import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
 import {
@@ -12,8 +12,9 @@ import LoginDialog from '../../../../components/Dialog/LoginDialog';
 import SignUpDialog from '../../../../components/Dialog/SignUpDialog';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Button, Typography } from '@mui/material';
-import { ButtonGroupWrapper } from '../../../../content/Calendar/PageHeader/page-header.style';
-
+import { ButtonGroupLoginWrapper, ButtonGroupWrapper } from '../../../../content/Calendar/PageHeader/page-header.style';
+import PersonIcon from '@mui/icons-material/Person';
+import { AppContext } from '../../../../contexts/AppContext';
 interface HeaderUserBoxProps {
     showConfirmChangeTabDialog: boolean;
 }
@@ -21,7 +22,7 @@ interface HeaderUserBoxProps {
 const HeaderUserBox: FC<HeaderUserBoxProps> = ({
 }) => {
     // const { handleLogout } = useCommonAuth();
-    // const { currentUser } = useContext(AppContext);
+    const { currentUser } = useContext(AppContext);
     const ref = useRef<any>(null);
     const [isOpen, setOpen] = useState<boolean>(false);
     const [isLoginDialogOpen, setLoginDialogOpen] = useState(false);
@@ -51,7 +52,7 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
         <>
             {
                 <>
-                    <ButtonGroupWrapper variant="outlined">
+                    <ButtonGroupLoginWrapper variant="outlined">
                         <Button
                             onClick={() => handleOpenLogin()}
                             color='secondary'
@@ -60,9 +61,9 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
                         >
                             <Typography>Login</Typography>
                         </Button>
-                    </ButtonGroupWrapper>
-                    <IconButtonWrapper color="primary" ref={ref} onClick={handleOpen}>
-                        {/* <PersonIcon /> */}
+                    </ButtonGroupLoginWrapper>
+                    <IconButtonWrapper color="primary" ref={ref} onClick={handleOpen} style={currentUser ?   {  display: "none"   } : {display: 'flex'} } >
+                        <PersonIcon />
                     </IconButtonWrapper>
                     <PopoverUser
                         key='user-box'

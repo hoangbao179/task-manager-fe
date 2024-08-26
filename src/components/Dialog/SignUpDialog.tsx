@@ -9,6 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { ISnackbarOption } from '../../models/ISnackbarOption';
 import { MSG_ERROR_COMMON } from '../../constants/common';
 import { FormValidateConfig } from '../../utils/helper/helper';
+import { User } from '../../models/User/IUser';
 interface SignUpDialogProps {
   open: boolean;
   onClose: () => void;
@@ -70,7 +71,7 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLo
       return;
     }
     try {
-      await AuthService.signUp(fullName, email, password)
+      await AuthService.register(fullName, email, password)
         .then((result) => {
           if (result.statusCode === HttpStatusCode.Ok || result.statusCode === HttpStatusCode.Created) {
             setSnackbarOption({
