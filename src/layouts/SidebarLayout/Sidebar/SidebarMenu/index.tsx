@@ -15,13 +15,14 @@ import { useContext, useState } from "react";
 import { ButtonSignOut, Drawer, DrawerHeader, IconButtonWrapper, ListItemButtonWrapper, ListItemIconWrapper, MenuWrapper, UserInfo, UserProfileMenu } from './sidebar-menu.styles';
 import { SidebarContext } from '../../../../contexts/SidebarContext';
 import { CalendarMonth } from '@mui/icons-material';
+import { AppContext } from '../../../../contexts/AppContext';
 function SidebarMenu(): JSX.Element {
     const theme = useTheme();
     const router = useRouter();
-    const isScreenMobile = useMediaQuery(theme.breakpoints.down('md'));
     const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
     const [open, setOpen] = useState(sidebarToggle);
     const isCalendar = router.pathname.includes('dashboard');
+    const {handleLogout, isScreenMobile} = useContext(AppContext);
 
     const handleDrawerOpen = (): void => {
         setOpen(true);
@@ -45,7 +46,7 @@ function SidebarMenu(): JSX.Element {
     };
 
     const onLogout = (): void => {
-        // handleLogout();
+        handleLogout();
     };
 
     return (

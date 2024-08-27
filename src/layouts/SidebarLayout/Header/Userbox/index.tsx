@@ -7,6 +7,8 @@ import {
     IconButtonWrapper,
     MenuUserBox,
     PopoverUser,
+    UserBoxLabel,
+    UserBoxText,
 } from './user-box.styles';
 import LoginDialog from '../../../../components/Dialog/LoginDialog';
 import SignUpDialog from '../../../../components/Dialog/SignUpDialog';
@@ -22,7 +24,7 @@ interface HeaderUserBoxProps {
 const HeaderUserBox: FC<HeaderUserBoxProps> = ({
 }) => {
     // const { handleLogout } = useCommonAuth();
-    const { currentUser } = useContext(AppContext);
+    const { currentUser, handleLogout } = useContext(AppContext);
     const ref = useRef<any>(null);
     const [isOpen, setOpen] = useState<boolean>(false);
     const [isLoginDialogOpen, setLoginDialogOpen] = useState(false);
@@ -34,9 +36,10 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
     const handleClose = (): void => {
         setOpen(false);
     };
-    // const onLogout = (): void => {
-    //     handleLogout(LOGOUT_ROUTER);
-    // };
+
+    const onLogout = (): void => {
+        handleLogout();
+    };
 
     const handleOpenSignUp = () => {
         setSignUpDialogOpen(true);
@@ -52,7 +55,7 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
         <>
             {
                 <>
-                    <ButtonGroupLoginWrapper variant="outlined">
+                    <ButtonGroupLoginWrapper variant="outlined" style={currentUser ? { display: "none" } : { display: 'flex' }} >
                         <Button
                             onClick={() => handleOpenLogin()}
                             color='secondary'
@@ -62,7 +65,7 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
                             <Typography>Login</Typography>
                         </Button>
                     </ButtonGroupLoginWrapper>
-                    <IconButtonWrapper color="primary" ref={ref} onClick={handleOpen} style={currentUser ?   {  display: "none"   } : {display: 'flex'} } >
+                    <IconButtonWrapper color="primary" ref={ref} onClick={handleOpen} style={currentUser ? { display: 'flex' } : { display: "none" }} >
                         <PersonIcon />
                     </IconButtonWrapper>
                     <PopoverUser
@@ -80,13 +83,16 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
                         }}
                     >
                         <MenuUserBox>
+                            <UserBoxText>
+                                <UserBoxLabel variant="body1">{currentUser?.fullName}</UserBoxLabel>
+                            </UserBoxText>
                         </MenuUserBox>
                         <ButtonActions>
-                            <ButtonAction fullWidth >
+                            {/* <ButtonAction fullWidth >
                                 <KeyIcon sx={{ mr: 1 }} />
                                 Change password
-                            </ButtonAction>
-                            <ButtonAction fullWidth >
+                            </ButtonAction> */}
+                            <ButtonAction fullWidth onClick={onLogout}>
                                 <LockOpenTwoToneIcon sx={{ mr: 1 }} />
                                 Sign out
                             </ButtonAction>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, Typography, colors, Snackbar, Alert, IconButton } from '@mui/material';
 import { AuthService } from '../../services/auth/auth.service';
 import { CancelButtonDialog, OkButtonDialog } from '../Button/Dialog/button-dialog.styles';
@@ -7,10 +7,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import LoadingSectionComponent from '../LoadingSection';
 import { ISnackbarOption } from '../../models/ISnackbarOption';
 import { HttpStatusCode } from 'axios';
-import { CURRENT_USER, MSG_ERROR_COMMON } from '../../constants/common';
+import { CURRENT_USER, MSG_ERROR_COMMON, TOKEN } from '../../constants/common';
 import { FormValidateConfig } from '../../utils/helper/helper';
-import { UserService } from '../../services/user/user.service';
 import { AccountService } from '../../services/user/account.service';
+import { AppContext } from '../../contexts/AppContext';
+import { UserDetail } from '../../models/User/UserDetail';
+
 interface LoginDialogProps {
   open: boolean;
   onClose: () => void;
@@ -24,6 +26,7 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [snackbarOption, setSnackbarOption] = useState<ISnackbarOption>({ open: false, type: 'success', messages: '' });
   const [submitting, setSubmitting] = useState(false);
+  const {setCurrentUser} = useContext(AppContext);
 
   useEffect(() => {
     if (!open) {
@@ -59,6 +62,7 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
     AccountService.getCurrentUser().then((result) => {
       if (result.statusCode === HttpStatusCode.Ok) {
         localStorage.setItem(CURRENT_USER, JSON.stringify(result.data));
+        setCurrentUser(result.data as UserDetail);
       }
     });
   }
@@ -70,7 +74,7 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
     try {
       await AuthService.login(email, password).then((result) => {
         if (result.statusCode === HttpStatusCode.Ok) {
-          localStorage.setItem('token', result.data?.token);
+          localStorage.setItem(TOKEN, result.data);
           onClose();
           getCurrentUser();
           setSnackbarOption({
