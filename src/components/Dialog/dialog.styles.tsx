@@ -1,4 +1,4 @@
-import { DialogTitle, Grid, Typography, styled } from "@mui/material";
+import { DialogActions, DialogTitle, Grid, Typography, styled } from "@mui/material";
 
 export const DialogSubtitle = styled(Typography)(
     ({ }) => `
@@ -65,5 +65,18 @@ export const CustomActions = styled(Grid)(
             width: 100%;
             padding-right: 0px;
         }
+    `
+);
+
+export const DialogActionsWrapper = styled(DialogActions)(
+    ({theme}) => `
+        display: flex;
+        justify-content: space-between;
+    `
+);
+
+export const TypographyButton = styled(Typography)(
+    ({}) => `
+        color: white;
     `
 );

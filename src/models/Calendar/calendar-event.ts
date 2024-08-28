@@ -54,6 +54,5 @@ export class CalendarEvent implements ICalendarEvent {
         this.endTime = event?.endTime;
         this.startTimeString = dayjs.isDayjs(event?.startTime) ? dayjs(event?.startTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${event.startDate} ${event?.startTime}`)).format(E_FormatDate.TimeEvent);
         this.endDateTimeString = dayjs.isDayjs(event?.endTime) ? dayjs(event?.endTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${event.endDate} ${event?.endTime}`)).format(E_FormatDate.TimeEvent);
-       
     }
 }

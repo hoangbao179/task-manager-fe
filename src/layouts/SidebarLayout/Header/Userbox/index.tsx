@@ -1,23 +1,29 @@
-import { FC, useRef, useState } from 'react';
+import { FC, useContext, useRef, useState } from 'react';
 import KeyIcon from '@mui/icons-material/Key';
 import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
 import {
     ButtonAction,
     ButtonActions,
+    IconButtonWrapper,
     MenuUserBox,
     PopoverUser,
+    UserBoxLabel,
+    UserBoxText,
 } from './user-box.styles';
 import LoginDialog from '../../../../components/Dialog/LoginDialog';
 import SignUpDialog from '../../../../components/Dialog/SignUpDialog';
-
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Button, Typography } from '@mui/material';
+import { ButtonGroupLoginWrapper, ButtonGroupWrapper } from '../../../../content/Calendar/PageHeader/page-header.style';
+import PersonIcon from '@mui/icons-material/Person';
+import { AppContext } from '../../../../contexts/AppContext';
 interface HeaderUserBoxProps {
     showConfirmChangeTabDialog: boolean;
 }
 
 const HeaderUserBox: FC<HeaderUserBoxProps> = ({
 }) => {
-    // const { handleLogout } = useCommonAuth();
-    // const { currentUser } = useContext(AppContext);
+    const { currentUser, handleLogout } = useContext(AppContext);
     const ref = useRef<any>(null);
     const [isOpen, setOpen] = useState<boolean>(false);
     const [isLoginDialogOpen, setLoginDialogOpen] = useState(false);
@@ -29,9 +35,11 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
     const handleClose = (): void => {
         setOpen(false);
     };
-    // const onLogout = (): void => {
-    //     handleLogout(LOGOUT_ROUTER);
-    // };
+
+    const onLogout = (): void => {
+        handleLogout();
+        handleClose();
+    };
 
     const handleOpenSignUp = () => {
         setSignUpDialogOpen(true);
@@ -47,7 +55,7 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
         <>
             {
                 <>
-                    {/* <ButtonGroupWrapper variant="outlined">
+                    <ButtonGroupLoginWrapper variant="outlined" style={currentUser ? { display: "none" } : { display: 'flex' }} >
                         <Button
                             onClick={() => handleOpenLogin()}
                             color='secondary'
@@ -56,10 +64,10 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
                         >
                             <Typography>Login</Typography>
                         </Button>
-                    </ButtonGroupWrapper>
-                    <IconButtonWrapper color="primary" ref={ref} onClick={handleOpen}>
+                    </ButtonGroupLoginWrapper>
+                    <IconButtonWrapper color="primary" ref={ref} onClick={handleOpen} style={currentUser ? { display: 'flex' } : { display: "none" }} >
                         <PersonIcon />
-                    </IconButtonWrapper> */}
+                    </IconButtonWrapper>
                     <PopoverUser
                         key='user-box'
                         anchorEl={ref.current}
@@ -75,13 +83,12 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
                         }}
                     >
                         <MenuUserBox>
+                            <UserBoxText>
+                                <UserBoxLabel variant="body1">Name: {currentUser?.firstName}</UserBoxLabel>
+                            </UserBoxText>
                         </MenuUserBox>
                         <ButtonActions>
-                            <ButtonAction fullWidth >
-                                <KeyIcon sx={{ mr: 1 }} />
-                                Change password
-                            </ButtonAction>
-                            <ButtonAction fullWidth >
+                            <ButtonAction fullWidth onClick={onLogout}>
                                 <LockOpenTwoToneIcon sx={{ mr: 1 }} />
                                 Sign out
                             </ButtonAction>

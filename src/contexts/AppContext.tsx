@@ -1,13 +1,16 @@
 import { useTheme } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { ReactNode, createContext, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, createContext, useEffect, useState } from 'react';
+import { UserDetail } from '../models/User/UserDetail';
+import { CURRENT_USER, TOKEN } from '../constants/common';
 
 type AppContext = {
-    verifyAuthentication: any;
     isScreenMobile: boolean;
     accessToken: string;
-    setVerifyAuthentication: (value: boolean) => void;
+    currentUser: UserDetail;
+    setCurrentUser: Dispatch<SetStateAction<UserDetail>>;
     setAccessToken: (accessToken: string) => void;
+    handleLogout: () => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -22,41 +25,41 @@ type Props = {
 export function AppProvider({ children }: Props): JSX.Element {
     const theme = useTheme();
     const isScreenMobile = useMediaQuery(theme.breakpoints.down('md'));
-    const [verifyAuthentication, setVerifyAuthentication] = useState<boolean>(false);
     const [accessToken, setAccessToken] = useState<string>(null);
-    // const setCurrentUser = (user: CurrentUser): void => {
-    //     const jsonUser = JSON.stringify(user);
-    //     const encodeUser = encodeAES(jsonUser);
+    const [currentUser, setCurrentUser] = useState<UserDetail>(null);
 
-    //     localStorage.setItem(CURRENT_USER, encodeUser);
-    //     setCurrentUserState(user);
-    // };
-    // useEffect(() => {
-    //     const accessToken: any = localStorage?.getItem(TOKEN);
-    //     const storedUser: any = localStorage?.getItem(CURRENT_USER);
+    useEffect(() => {
+        const accessToken: any = localStorage?.getItem(TOKEN);
+        const storedUser: any = localStorage?.getItem(CURRENT_USER);
 
-    //     setAccessToken(accessToken);
+        setAccessToken(accessToken);
 
-    //     if (storedUser) {
-    //         try {
-    //             const currentUser = new CurrentUser(JSON.parse(storedUser));
-    //             if (currentUser instanceof CurrentUser) {
-    //                 setCurrentUserState(currentUser);
-    //             }
-    //         }
-    //         catch (_) {
-    //             const decodeUser = decodeAES(storedUser);
-    //             setCurrentUserState(JSON.parse(decodeUser));
-    //         }
-    //     }  
-    // }, []);
+        if (storedUser) {
+            try {
+                const currentUser = new UserDetail(JSON.parse(storedUser));
+                if (currentUser instanceof UserDetail) {
+                    setCurrentUser(currentUser);
+                }
+            }
+            catch (_) {
+            }
+        }  
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem(TOKEN);
+        localStorage.removeItem(CURRENT_USER);
+        setCurrentUser(null);
+    }
+
     return (
         <AppContext.Provider
             value={{
-                verifyAuthentication,
                 isScreenMobile,
                 accessToken,
-                setVerifyAuthentication,
+                currentUser,
+                handleLogout,
+                setCurrentUser,
                 setAccessToken
             }}
         >

@@ -1,19 +1,17 @@
-import axios from 'axios';
 import { IResponseData } from '../../models/IResponseData';
-import { IUser } from '../../models/User/IUser';
+import { axiosRequest } from '../../utils/configs/axios.config';
 
 const BASE_API = `${process.env.NEXT_PUBLIC_API_URL}`;
-const LOGIN_URL = `${BASE_API}/auth/login`;
-const REGISTER_URL = `${BASE_API}/auth/register`;
 
-export class AuthService {
-  static async login(email: string, password: string): Promise<IResponseData<{ token: string }>> {
-    const response = await axios.post<IResponseData<{ token: string }>>(LOGIN_URL, { email, password });
-    return response.data;
-  }
+const login = (email: string, password: string): Promise<IResponseData<string>> => {
+  return axiosRequest.post<any, IResponseData<string>>(`${BASE_API}/auth/login`, { email, password });
+};
 
-  static async signUp(fullName: string, email: string, password: string): Promise<IResponseData<IUser>> {
-    const response = await axios.post<IResponseData<IUser>>(REGISTER_URL, { fullName, email, password });
-    return response.data;
-  }
-}
+const register = (name: string, email: string, password: string): Promise<IResponseData<null>> => {
+  return axiosRequest.post<any, IResponseData<null>>(`${BASE_API}/auth/register`, { email: email, password: password, fullName: name });
+};
+
+export const AuthService = {
+  login,
+  register
+};

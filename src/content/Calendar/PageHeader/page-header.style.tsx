@@ -44,6 +44,33 @@ export const ButtonGroupWrapper = styled(ButtonGroup)(
     `
 );
 
+export const ButtonGroupLoginWrapper = styled(ButtonGroup)(
+    ({ theme }) => `
+        margin-top: 0px;
+        margin-left: 10px;
+        height: 45px;
+        
+        .MuiTypography-root {
+            font-size: 13px;
+            color: #fff;
+        }
+
+        ${theme.breakpoints.down('md')} {
+            margin-bottom: 0px;
+            height: 40px;
+            min-width: auto;
+
+            .MuiButton-startIcon {
+                margin-right: 0px;
+                margin-left: 0px;
+            }
+            .MuiTypography-root {
+                display: none;
+            }
+        }
+    `
+);
+
 export const CustomSelectBox = styled(Select)( ({ theme }) => `
     ${theme.breakpoints.down('md')} {
         width: 60px;
