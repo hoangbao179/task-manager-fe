@@ -9,9 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { ISnackbarOption } from '../../models/ISnackbarOption';
 import { MSG_ERROR_COMMON } from '../../constants/common';
 import { FormValidateConfig } from '../../utils/helper/helper';
-import { User } from '../../models/User/IUser';
 import { Controller, useForm } from 'react-hook-form';
-import { ICalendarEventForm } from '../../models/Calendar/calendar-event.form';
 import { IUserForm } from '../../models/User/IUserForm';
 interface SignUpDialogProps {
   open: boolean;
@@ -22,7 +20,7 @@ interface SignUpDialogProps {
 const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLogin }) => {
   const [snackbarOption, setSnackbarOption] = useState<ISnackbarOption>({ open: false, type: 'success', messages: '' });
   const [submitting, setSubmitting] = useState(false);
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<IUserForm>({ mode: 'all' });
+  const {control, handleSubmit, reset, formState: { errors } } = useForm<IUserForm>({ mode: 'all' });
 
   useEffect(() => {
     if (!open) {

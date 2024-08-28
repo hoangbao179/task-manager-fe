@@ -84,7 +84,7 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
                     >
                         <MenuUserBox>
                             <UserBoxText>
-                                <UserBoxLabel variant="body1">Name: {currentUser?.firstName}</UserBoxLabel>
+                                <UserBoxLabel variant="body1">Name: {currentUser?.firstName} - {currentUser?.lastName}</UserBoxLabel>
                             </UserBoxText>
                         </MenuUserBox>
                         <ButtonActions>

@@ -12,6 +12,8 @@ import { FormValidateConfig } from '../../utils/helper/helper';
 import { AccountService } from '../../services/user/account.service';
 import { AppContext } from '../../contexts/AppContext';
 import { UserDetail } from '../../models/User/UserDetail';
+import { Controller, useForm } from 'react-hook-form';
+import { ILoginForm } from '../../models/User/ILoginForm';
 
 interface LoginDialogProps {
   open: boolean;
@@ -26,37 +28,13 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [snackbarOption, setSnackbarOption] = useState<ISnackbarOption>({ open: false, type: 'success', messages: '' });
   const [submitting, setSubmitting] = useState(false);
-  const {setCurrentUser} = useContext(AppContext);
-
+  const { setCurrentUser } = useContext(AppContext);
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<ILoginForm>({ mode: 'all'});
   useEffect(() => {
     if (!open) {
-      setEmail('');
-      setPassword('');
-      setEmailError(null);
-      setPasswordError(null);
+      reset();
     }
-  }, [open]);
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const emailValue = e.target.value;
-    setEmail(emailValue);
-    if (!FormValidateConfig.Pattern.Email.test(emailValue)) {
-      setEmailError('Email not valid!');
-      return;
-    }
-    setEmailError(null);
-    
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const passwordValue = e.target.value;
-    setPassword(passwordValue);
-    if (passwordValue.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
-      return;
-    }
-    setPasswordError(null);
-  };
+  }, [open, reset]);
 
   const getCurrentUser = async () => {
     AccountService.getCurrentUser().then((result) => {
@@ -67,12 +45,12 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
     });
   }
 
-  const handleLogin = async () => {
-    if (!!emailError || !!passwordError || !email || !password) {
+  const handleLogin = async (loginForm: ILoginForm ) => {
+    if (!loginForm.email || !loginForm.password) {
       return;
     }
     try {
-      await AuthService.login(email, password).then((result) => {
+      await AuthService.login(loginForm).then((result) => {
         if (result.statusCode === HttpStatusCode.Ok) {
           localStorage.setItem(TOKEN, result.data);
           localStorage.removeItem(LOCAL_CALENDAR);
@@ -117,36 +95,59 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
     <>
       <Dialog open={open} onClose={onClose}>
         <DialogTitle>Login</DialogTitle>
-        <DialogContent style={{width : '500px'}}>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Email"
-            type="email"
-            fullWidth
-            value={email}
-            onChange={handleEmailChange}
-            helperText={emailError}
-            FormHelperTextProps={{
-              style: { width: '300px', color: emailError ? 'red' : undefined },
+        <DialogContent style={{ width: '500px' }}>
+          <Controller
+            name="email"
+            control={control}
+            defaultValue=""
+            rules={{
+              required: 'Email is required',
+              pattern: {
+                value: FormValidateConfig.Pattern.Email,
+                message: 'Email not valid!',
+              },
             }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                margin="dense"
+                label="Email"
+                type="email"
+                fullWidth
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+            )}
           />
-          <TextField
-            margin="dense"
-            label="Password"
-            type="password"
-            fullWidth
-            value={password}
-            onChange={handlePasswordChange}
-            helperText={passwordError}FormHelperTextProps={{
-              style: { width: '300px', color: passwordError ? 'red' : undefined },
+          <Controller
+            name="password"
+            control={control}
+            defaultValue=""
+            rules={{
+              required: 'Password is required',
+              minLength: {
+                value: 6,
+                message: 'Password must be at least 6 characters',
+              },
             }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                margin="dense"
+                label="Password"
+                type="password"
+                fullWidth
+                error={!!errors.password}
+                helperText={errors.password?.message}
+              />
+            )}
           />
-
         </DialogContent>
+
+
         <DialogActionsWrapper>
           <CancelButtonDialog onClick={onClose} variant="outlined">Cancel</CancelButtonDialog>
-          <OkButtonDialog onClick={handleLogin} variant="outlined"  disabled={!!emailError || !!passwordError || !email || !password}><TypographyButton>OK</TypographyButton></OkButtonDialog>
+          <OkButtonDialog onClick={handleSubmit(handleLogin)} variant="outlined" disabled={submitting}><TypographyButton>OK</TypographyButton></OkButtonDialog>
         </DialogActionsWrapper>
         <Box style={{ padding: '10px', textAlign: 'center' }}>
           <Button onClick={onSwitchToSignUp}>Don't have an account? Sign up</Button>
