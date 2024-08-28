@@ -287,7 +287,6 @@ const CalendarContent: FC<any> = (): JSX.Element => {
                     res.data.startTimeString = dayjs.isDayjs(res.data?.startTime) ? dayjs(res.data?.startTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${res.data.startDate} ${res.data?.startTime}`)).format(E_FormatDate.TimeEvent);
                     res.data.endDateTimeString = dayjs.isDayjs(res.data?.endTime) ? dayjs(res.data?.endTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${res.data.endDate} ${res.data?.endTime}`)).format(E_FormatDate.TimeEvent);
                     setCurrentEvent(res.data);
-                    setCurrentEvent(res.data);
                 };
             })
             .finally(() => {
@@ -354,8 +353,8 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     };
 
     const parsingEvent = (data: CalendarEvent): EventInput => {
-        const start = combineDateTimeUTC(data.startDate, null, data.isAllDay).toString();
-        const end = combineDateTimeUTC(data.endDate, null, data.isAllDay).toString();
+        const start = combineDateTimeUTC(data.startDate, data.startTime, data.isAllDay).toString();
+        const end = combineDateTimeUTC(data.endDate, data.endTime, data.isAllDay).toString();
         var startDate = new Date(start);
         var endDate = new Date(end);
         if (data.isAllDay && endDate.getDate() != startDate.getDate()) {

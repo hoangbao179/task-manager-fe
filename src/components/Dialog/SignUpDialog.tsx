@@ -10,6 +10,9 @@ import { ISnackbarOption } from '../../models/ISnackbarOption';
 import { MSG_ERROR_COMMON } from '../../constants/common';
 import { FormValidateConfig } from '../../utils/helper/helper';
 import { User } from '../../models/User/IUser';
+import { Controller, useForm } from 'react-hook-form';
+import { ICalendarEventForm } from '../../models/Calendar/calendar-event.form';
+import { IUserForm } from '../../models/User/IUserForm';
 interface SignUpDialogProps {
   open: boolean;
   onClose: () => void;
@@ -17,46 +20,15 @@ interface SignUpDialogProps {
 }
 
 const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLogin }) => {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [snackbarOption, setSnackbarOption] = useState<ISnackbarOption>({ open: false, type: 'success', messages: '' });
   const [submitting, setSubmitting] = useState(false);
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<IUserForm>({ mode: 'all' });
 
   useEffect(() => {
     if (!open) {
-      setFullName('');
-      setEmail('');
-      setPassword('');
+      reset();
     }
-  }, [open]);
-  
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const emailValue = e.target.value;
-    setEmail(emailValue);
-    if (!FormValidateConfig.Pattern.Email.test(email)) {
-      setEmailError('Email not valid!');
-      return;
-    }
-    else {
-      setEmailError('');
-    }
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const passwordValue = e.target.value;
-    setPassword(passwordValue);
-
-    if (passwordValue.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
-    } else {
-      setPasswordError('');
-    }
-  };
-
+  }, [open, reset]);
 
   const handleCloseSnackbar = (): void => {
     setSnackbarOption({
@@ -65,13 +37,13 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLo
       messages: ''
     });
   };
-  
-  const handleSignUp = async () => {
-    if (!!emailError || !!passwordError || !email || !password) {
+
+  const handleSignUp = async (data: IUserForm) => {
+    if (!data.email || !data.password) {
       return;
     }
     try {
-      await AuthService.register(fullName, email, password)
+      await AuthService.register(data)
         .then((result) => {
           if (result.statusCode === HttpStatusCode.Ok || result.statusCode === HttpStatusCode.Created) {
             setSnackbarOption({
@@ -113,42 +85,89 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSwitchToLo
     <>
       <Dialog open={open} onClose={onClose}>
         <DialogTitle>Register</DialogTitle>
-        <DialogContent style={{width : '500px'}}>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Full name"
-            fullWidth
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+        <DialogContent style={{ width: '500px' }}>
+          <Controller
+            name="firstName"
+            control={control}
+            defaultValue=""
+            rules={{ required: 'First name is required' }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                margin="dense"
+                label="First name"
+                fullWidth
+                error={!!errors.firstName}
+                helperText={errors.firstName?.message}
+              />
+            )}
           />
-          <TextField
-            margin="dense"
-            label="Email"
-            type="email"
-            fullWidth
-            value={email}
-            onChange={handleEmailChange}
-            helperText={emailError}
-            FormHelperTextProps={{
-              style: { width: '300px', color: emailError ? 'red' : undefined },
-            }}
+          <Controller
+            name="lastName"
+            control={control}
+            defaultValue=""
+            rules={{ required: 'Last name is required' }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                margin="dense"
+                label="Last name"
+                fullWidth
+                error={!!errors.lastName}
+                helperText={errors.lastName?.message}
+              />
+            )}
           />
-          <TextField
-            margin="dense"
-            label="Password"
-            type="password"
-            fullWidth
-            value={password}
-            onChange={handlePasswordChange}
-            helperText={passwordError}FormHelperTextProps={{
-              style: { width: '300px', color: passwordError ? 'red' : undefined },
+          <Controller
+            name="email"
+            control={control}
+            defaultValue=""
+            rules={{
+              required: 'Email is required',
+              pattern: {
+                value: FormValidateConfig.Pattern.Email,
+                message: 'Email not valid!',
+              },
             }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                margin="dense"
+                label="Email"
+                type="email"
+                fullWidth
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+            )}
+          />
+          <Controller
+            name="password"
+            control={control}
+            defaultValue=""
+            rules={{
+              required: 'Password is required',
+              minLength: {
+                value: 6,
+                message: 'Password must be at least 6 characters',
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                margin="dense"
+                label="Password"
+                type="password"
+                fullWidth
+                error={!!errors.password}
+                helperText={errors.password?.message}
+              />
+            )}
           />
         </DialogContent>
         <DialogActionsWrapper>
           <CancelButtonDialog onClick={onClose} variant="outlined">Cancel</CancelButtonDialog>
-          <OkButtonDialog onClick={handleSignUp} variant="outlined" disabled={!!emailError || !!passwordError || !email || !password}><TypographyButton>Sign Up</TypographyButton></OkButtonDialog>
+          <OkButtonDialog onClick={handleSubmit(handleSignUp)} variant="outlined" disabled={submitting}><TypographyButton>Sign Up</TypographyButton></OkButtonDialog>
         </DialogActionsWrapper>
         <div style={{ padding: '10px', textAlign: 'center' }}>
           <Button onClick={onSwitchToLogin}>Already have an account? Log in</Button>
