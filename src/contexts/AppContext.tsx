@@ -50,6 +50,7 @@ export function AppProvider({ children }: Props): JSX.Element {
         localStorage.removeItem(TOKEN);
         localStorage.removeItem(CURRENT_USER);
         setCurrentUser(null);
+        setAccessToken(null);
     }
 
     return (
