@@ -24,7 +24,7 @@ import { CustomActions, CustomDialogDetailTitle } from "../../../components/Dial
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import { CALENDAR_LOCAL, MSG_ERROR_COMMON } from "../../../constants/common";
+import { LOCAL_CALENDAR, MSG_ERROR_COMMON } from "../../../constants/common";
 import { CancelButtonDialog, OkButtonDialog } from "../../../components/Button/Dialog/button-dialog.styles";
 import LoadingSectionComponent from "../../../components/LoadingSection";
 import { CalendarEventForm, ICalendarEventForm } from "../../../models/Calendar/calendar-event.form";
@@ -70,9 +70,9 @@ const CalendarContent: FC<any> = (): JSX.Element => {
             getAllEvent(rangeCalendarView);
         }
         else {
-            setEvents(JSON.parse(localStorage.getItem(CALENDAR_LOCAL)) || []);
+            setEvents(JSON.parse(localStorage.getItem(LOCAL_CALENDAR)) || []);
         }
-    }, [rangeCalendarView]);
+    }, [rangeCalendarView, currentUser]);
 
     useEffect(() => {
         if (events && events.length && calendarApi) {
@@ -158,85 +158,95 @@ const CalendarContent: FC<any> = (): JSX.Element => {
         handleClose();
     };
 
+    const handleCalendarLocal = (existingEvents: CalendarEvent[], data: ICalendarEventForm): void => {
+        existingEvents.push(new CalendarEventForm(data));
+        localStorage.setItem(LOCAL_CALENDAR, JSON.stringify(existingEvents));
+    }
+
     const onSubmitCalendarEvent = async (data: ICalendarEventForm): Promise<void> => {
         if (!currentUser) {
-            const existingEvents = JSON.parse(localStorage.getItem(CALENDAR_LOCAL)) || [];
+            const existingEvents = (JSON.parse(localStorage.getItem(LOCAL_CALENDAR)) || []) as CalendarEvent[];
             if (existingEvents.length >= 3) {
-
-            } else {
-                // existingEvents.push(event);
-                //TODO
-                localStorage.setItem(CALENDAR_LOCAL, JSON.stringify(existingEvents));
-            }
-        }
-        setSubmitting(true);
-        const param = new CalendarEventForm(data);
-        if (data?.id) {
-            CalendarEventService.update(param, data?.id)
-                .then(result => {
-                    if (result.statusCode === HttpStatusCode.Ok) {
-                        if (showConfirmChangeTabDialog) {
-                            setShowConfirmChangeTabDialog(false);
-
-                            clearForm();
-                        } else {
-                            setShowAddEventDialog(false);
-                        }
-
-                        getAllEvent(rangeCalendarView);
-                    }
-                    else {
-                        setSnackbarOption({
-                            open: true,
-                            type: 'error',
-                            messages: result.message
-                        });
-                    }
-                })
-                .catch(() => {
-                    setSnackbarOption({
-                        open: true,
-                        type: 'error',
-                        messages: MSG_ERROR_COMMON
-                    });
-                })
-                .finally(() => {
-                    setSubmitting(false);
+                setSnackbarOption({
+                    open: true,
+                    type: 'error',
+                    messages: "You can only add 3 events if you are not logged in"
                 });
+            } else {
+                handleCalendarLocal(existingEvents, data);
+            }
+            setShowAddEventDialog(false);
+            clearForm();
         }
         else {
-            CalendarEventService.createCalendarEvent(param)
-                .then(result => {
-                    if (result.statusCode === HttpStatusCode.Ok && result.data) {
-                        if (showConfirmChangeTabDialog) {
-                            setShowConfirmChangeTabDialog(false);
-                            clearForm();
+            setSubmitting(true);
+            const param = new CalendarEventForm(data);
+            if (data?.id) {
+                CalendarEventService.update(param, data?.id)
+                    .then(result => {
+                        if (result.statusCode === HttpStatusCode.Ok) {
+                            if (showConfirmChangeTabDialog) {
+                                setShowConfirmChangeTabDialog(false);
+                                clearForm();
+                            } else {
+                                setShowAddEventDialog(false);
+                            }
+
+                            getAllEvent(rangeCalendarView);
                         }
                         else {
-                            setShowAddEventDialog(false);
+                            setSnackbarOption({
+                                open: true,
+                                type: 'error',
+                                messages: result.message
+                            });
                         }
-                        getAllEvent(rangeCalendarView);
-                    }
-                    else {
+                    })
+                    .catch(() => {
                         setSnackbarOption({
                             open: true,
                             type: 'error',
-                            messages: result.message
+                            messages: MSG_ERROR_COMMON
                         });
-                    }
-                })
-                .catch(() => {
-                    setSnackbarOption({
-                        open: true,
-                        type: 'error',
-                        messages: MSG_ERROR_COMMON
+                    })
+                    .finally(() => {
+                        setSubmitting(false);
                     });
-                })
-                .finally(() => {
-                    setSubmitting(false);
-                });
-        }
-    };
+            }
+            else {
+                CalendarEventService.createCalendarEvent(param)
+                    .then(result => {
+                        if (result.statusCode === HttpStatusCode.Ok && result.data) {
+                            if (showConfirmChangeTabDialog) {
+                                setShowConfirmChangeTabDialog(false);
+                                clearForm();
+                            }
+                            else {
+                                setShowAddEventDialog(false);
+                            }
+                            getAllEvent(rangeCalendarView);
+                        }
+                        else {
+                            setSnackbarOption({
+                                open: true,
+                                type: 'error',
+                                messages: result.message
+                            });
+                        }
+                    })
+                    .catch(() => {
+                        setSnackbarOption({
+                            open: true,
+                            type: 'error',
+                            messages: MSG_ERROR_COMMON
+                        });
+                    })
+                    .finally(() => {
+                        setSubmitting(false);
+                    });
+            }
+        };
+    }
 
     const getDateSetDefault = (date: DatesSetArg): void => {
         setTimeout(() => {

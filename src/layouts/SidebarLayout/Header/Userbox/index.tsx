@@ -38,6 +38,7 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
 
     const onLogout = (): void => {
         handleLogout();
+        handleClose();
     };
 
     const handleOpenSignUp = () => {
