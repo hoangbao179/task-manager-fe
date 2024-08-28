@@ -161,6 +161,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     const handleCalendarLocal = (existingEvents: CalendarEvent[], data: ICalendarEventForm): void => {
         existingEvents.push(new CalendarEventForm(data));
         localStorage.setItem(LOCAL_CALENDAR, JSON.stringify(existingEvents));
+        setEvents(existingEvents);
     }
 
     const onSubmitCalendarEvent = async (data: ICalendarEventForm): Promise<void> => {
