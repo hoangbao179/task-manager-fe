@@ -55,6 +55,6 @@ export class CalendarEventForm implements ICalendarEventForm {
         this.minutesOffset = event?.minutesOffset;
         this.startTime = event.startTime ? dayjs(event.startTime).format('HH:mm:ss') : null;
         this.endTime = event.endTime ? dayjs(event.endTime).format('HH:mm:ss') : null;
-        this.minutesOffset = (new Date()).getTimezoneOffset();
+        this.minutesOffset = event?.isAllDay ? 0 : (new Date()).getTimezoneOffset();
     }
 }
