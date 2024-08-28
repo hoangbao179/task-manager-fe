@@ -23,7 +23,6 @@ interface HeaderUserBoxProps {
 
 const HeaderUserBox: FC<HeaderUserBoxProps> = ({
 }) => {
-    // const { handleLogout } = useCommonAuth();
     const { currentUser, handleLogout } = useContext(AppContext);
     const ref = useRef<any>(null);
     const [isOpen, setOpen] = useState<boolean>(false);
@@ -84,14 +83,10 @@ const HeaderUserBox: FC<HeaderUserBoxProps> = ({
                     >
                         <MenuUserBox>
                             <UserBoxText>
-                                <UserBoxLabel variant="body1">{currentUser?.fullName}</UserBoxLabel>
+                                <UserBoxLabel variant="body1">Name: {currentUser?.firstName}</UserBoxLabel>
                             </UserBoxText>
                         </MenuUserBox>
                         <ButtonActions>
-                            {/* <ButtonAction fullWidth >
-                                <KeyIcon sx={{ mr: 1 }} />
-                                Change password
-                            </ButtonAction> */}
                             <ButtonAction fullWidth onClick={onLogout}>
                                 <LockOpenTwoToneIcon sx={{ mr: 1 }} />
                                 Sign out

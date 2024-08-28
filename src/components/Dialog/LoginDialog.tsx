@@ -7,7 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import LoadingSectionComponent from '../LoadingSection';
 import { ISnackbarOption } from '../../models/ISnackbarOption';
 import { HttpStatusCode } from 'axios';
-import { CURRENT_USER, MSG_ERROR_COMMON, TOKEN } from '../../constants/common';
+import { CALENDAR_LOCAL, CURRENT_USER, MSG_ERROR_COMMON, TOKEN } from '../../constants/common';
 import { FormValidateConfig } from '../../utils/helper/helper';
 import { AccountService } from '../../services/user/account.service';
 import { AppContext } from '../../contexts/AppContext';
@@ -75,6 +75,7 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose, onSwitchToSign
       await AuthService.login(email, password).then((result) => {
         if (result.statusCode === HttpStatusCode.Ok) {
           localStorage.setItem(TOKEN, result.data);
+          localStorage.removeItem(CALENDAR_LOCAL);
           onClose();
           getCurrentUser();
           setSnackbarOption({

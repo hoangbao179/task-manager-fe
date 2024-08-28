@@ -1,5 +1,5 @@
 import { HttpStatusCode } from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import moment from "moment";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Typography } from "@mui/material";
 import { ButtonGroupWrapper, GridCalendarHeader } from "../PageHeader/page-header.style";
@@ -24,7 +24,7 @@ import { CustomActions, CustomDialogDetailTitle } from "../../../components/Dial
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import { MSG_ERROR_COMMON } from "../../../constants/common";
+import { CALENDAR_LOCAL, MSG_ERROR_COMMON } from "../../../constants/common";
 import { CancelButtonDialog, OkButtonDialog } from "../../../components/Button/Dialog/button-dialog.styles";
 import LoadingSectionComponent from "../../../components/LoadingSection";
 import { CalendarEventForm, ICalendarEventForm } from "../../../models/Calendar/calendar-event.form";
@@ -35,6 +35,7 @@ import AddEventCalendarPopup from "../AddEventCalendarPopup";
 import EventDetailPopupComponent from "../EventDetailPopup";
 import dayjs from "dayjs";
 import { E_FormatDate } from "../../../enums/E_FormatDate";
+import { AppContext } from "../../../contexts/AppContext";
 export enum ECalendarMode {
     YEAR = 'multiMonthYear',
     MONTH = 'dayGridMonth',
@@ -62,9 +63,15 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     const [snackbarOption, setSnackbarOption] = useState<ISnackbarOption>({ open: false, type: 'success', messages: '' });
     const [showConfirmChangeTabDialog, setShowConfirmChangeTabDialog] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const { currentUser } = useContext(AppContext);
 
     useEffect(() => {
-        getAllEvent(rangeCalendarView);
+        if (currentUser) {
+            getAllEvent(rangeCalendarView);
+        }
+        else {
+            setEvents(JSON.parse(localStorage.getItem(CALENDAR_LOCAL)) || []);
+        }
     }, [rangeCalendarView]);
 
     useEffect(() => {
@@ -152,6 +159,16 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     };
 
     const onSubmitCalendarEvent = async (data: ICalendarEventForm): Promise<void> => {
+        if (!currentUser) {
+            const existingEvents = JSON.parse(localStorage.getItem(CALENDAR_LOCAL)) || [];
+            if (existingEvents.length >= 3) {
+
+            } else {
+                // existingEvents.push(event);
+                //TODO
+                localStorage.setItem(CALENDAR_LOCAL, JSON.stringify(existingEvents));
+            }
+        }
         setSubmitting(true);
         const param = new CalendarEventForm(data);
         if (data?.id) {
@@ -300,7 +317,7 @@ const CalendarContent: FC<any> = (): JSX.Element => {
 
     const handleSubmitDeleteEvent = (): void => {
         setSubmitting(true);
-        CalendarEventService.delete(currentEvent.id)
+        CalendarEventService.deleteEvent(currentEvent.id)
             .then((result) => {
                 if (result.statusCode === HttpStatusCode.Ok) {
                     getAllEvent(rangeCalendarView);

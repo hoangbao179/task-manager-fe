@@ -1,17 +1,20 @@
 export interface IUserDetail {
     id: string,
-    fullName: string,
+    firstName: string,
+    lastName: string,
     email: string,
 }
 
 export class UserDetail implements IUserDetail {
     id: string;
-    fullName: string;
+    firstName: string;
+    lastName: string;
     email: string;
 
     constructor(users: IUserDetail) {
         this.id = users.id;
-        this.fullName = users.fullName;
+        this.firstName = users.firstName;
+        this.lastName = users.lastName;
         this.email = users.email;
     }
 }

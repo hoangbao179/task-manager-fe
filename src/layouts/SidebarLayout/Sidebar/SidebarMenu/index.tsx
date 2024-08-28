@@ -22,8 +22,9 @@ function SidebarMenu(): JSX.Element {
     const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
     const [open, setOpen] = useState(sidebarToggle);
     const isCalendar = router.pathname.includes('dashboard');
-    const {handleLogout, isScreenMobile} = useContext(AppContext);
-
+    const {handleLogout} = useContext(AppContext);
+    const isScreenMobile = useMediaQuery(theme.breakpoints.down('md'));
+    
     const handleDrawerOpen = (): void => {
         setOpen(true);
     };
