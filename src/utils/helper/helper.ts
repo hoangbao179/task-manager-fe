@@ -33,8 +33,13 @@ export const combineDateTime = (dateInput: string | Date, timeInput: string | Da
     return dayjs(dateString);
 };
 
-export const combineDateTimeUTC = (dateInput: string | Date, timeInput?: string | Date | Dayjs, allDay?: boolean): Dayjs => {
+export const combineDateTimeUTC = (dateInput: string | Date, timeInput?: string | Date | Dayjs, allDay?: boolean, isLocal?: boolean): Dayjs => {
     const time = timeInput?.toString() || '00:00:00';
+    if( isLocal) {
+        const date = allDay ? new Date(new Date(dateInput + ' ' + time))
+        : new Date(dateInput + ' ' + time);
+        return dayjs(date);  
+    }
     const date = allDay ? new Date(new Date(dateInput + ' ' + time).toLocaleString('en', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }))
         : new Date(dateInput + ' ' + time + ' GMT+0');
     return dayjs(date);

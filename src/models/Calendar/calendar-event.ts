@@ -14,6 +14,7 @@ export interface ICalendarEvent {
     endTime?: Date | string | Dayjs;
     startTimeString?: string;
     endDateTimeString?: string;
+    localTimeZone?: boolean;
 }
 
 export interface IRangeCalendarView {
@@ -40,13 +41,14 @@ export class CalendarEvent implements ICalendarEvent {
     endTime?: Date | string | Dayjs;
     startTimeString?: string;
     endDateTimeString?: string;
+    localTimeZone?: boolean;
 
     constructor(event: ICalendarEvent) {
         this.id = event?.id;
         this.title = event?.title?.trim();
         this.startDate = event?.startDate;
         this.endDate = event?.endDate;
-        this.isAllDay = event?.isAllDay;
+        this.isAllDay = event?.isAllDay || false;
         this.description = event?.description?.trim();
         this.user = event?.user;
         this.isSetTimeModeWeek = false;
@@ -54,5 +56,6 @@ export class CalendarEvent implements ICalendarEvent {
         this.endTime = event?.endTime;
         this.startTimeString = dayjs.isDayjs(event?.startTime) ? dayjs(event?.startTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${event.startDate} ${event?.startTime}`)).format(E_FormatDate.TimeEvent);
         this.endDateTimeString = dayjs.isDayjs(event?.endTime) ? dayjs(event?.endTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${event.endDate} ${event?.endTime}`)).format(E_FormatDate.TimeEvent);
+        this.localTimeZone = event?.localTimeZone || false;
     }
 }
