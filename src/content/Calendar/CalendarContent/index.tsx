@@ -15,7 +15,7 @@ import { FC } from "react";
 import { IRangeCalendarView } from "../../../models/Task/task.model";
 import { ISnackbarOption } from "../../../models/ISnackbarOption";
 import { DatesSetArg, EventInput } from "@fullcalendar/core";
-import { combineDateTimeUTC } from "../../../utils/helper/helper";
+import { combineDateTimeUTC, generateUuidV4 } from "../../../utils/helper/helper";
 import { ModeEditOutline } from "@mui/icons-material";
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
@@ -159,7 +159,18 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     };
 
     const handleCalendarLocal = (existingEvents: CalendarEvent[], data: ICalendarEventForm): void => {
-        existingEvents.push(new CalendarEventForm(data));
+        const param = new CalendarEventForm(data);
+        let newCalendarEvent = new CalendarEvent(data);
+        newCalendarEvent = new CalendarEvent({
+            ...newCalendarEvent,
+            id: generateUuidV4(),
+            startDate: param.startDate,
+            endDate: param.endDate,
+            startTime: param.startTime,
+            endTime: param.endTime,
+            localTimeZone: true
+        });
+        existingEvents.push(newCalendarEvent);
         localStorage.setItem(LOCAL_CALENDAR, JSON.stringify(existingEvents));
         setEvents(existingEvents);
     }
@@ -277,22 +288,29 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     };
 
     const getEventById = (id: string): void => {
-        setSubmitting(true);
-        CalendarEventService.getCalendarEventById(id)
-            .then(res => {
-                if (res.statusCode === HttpStatusCode.Ok) {
-                    res.data.startDate = dayjs(combineDateTimeUTC(res.data.startDate, res.data.startTime, res.data.isAllDay)).format('YYYY-MM-DD');
-                    res.data.endDate = dayjs(combineDateTimeUTC(res.data.endDate, res.data.endTime, res.data.isAllDay)).format('YYYY-MM-DD');
-                    res.data.startTime = dayjs(combineDateTimeUTC(res.data.startDate, res.data.startTime, res.data.isAllDay)).format('HH:mm:ss');
-                    res.data.endTime = dayjs(combineDateTimeUTC(res.data.endDate, res.data.endTime, res.data.isAllDay)).format('HH:mm:ss');
-                    res.data.startTimeString = dayjs.isDayjs(res.data?.startTime) ? dayjs(res.data?.startTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${res.data.startDate} ${res.data?.startTime}`)).format(E_FormatDate.TimeEvent);
-                    res.data.endDateTimeString = dayjs.isDayjs(res.data?.endTime) ? dayjs(res.data?.endTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${res.data.endDate} ${res.data?.endTime}`)).format(E_FormatDate.TimeEvent);
-                    setCurrentEvent(res.data);
-                };
-            })
-            .finally(() => {
-                setSubmitting(false);
-            });
+        if(!currentUser){
+            const existingEvents = (JSON.parse(localStorage.getItem(LOCAL_CALENDAR)) || []) as CalendarEvent[];
+            const event = existingEvents.find(e => e.id === id);
+            setCurrentEvent(event);
+        }
+        else {
+            setSubmitting(true);
+            CalendarEventService.getCalendarEventById(id)
+                .then(res => {
+                    if (res.statusCode === HttpStatusCode.Ok) {
+                        res.data.startDate = dayjs(combineDateTimeUTC(res.data.startDate, res.data.startTime, res.data.isAllDay)).format('YYYY-MM-DD');
+                        res.data.endDate = dayjs(combineDateTimeUTC(res.data.endDate, res.data.endTime, res.data.isAllDay)).format('YYYY-MM-DD');
+                        res.data.startTime = dayjs(combineDateTimeUTC(res.data.startDate, res.data.startTime, res.data.isAllDay)).format('HH:mm:ss');
+                        res.data.endTime = dayjs(combineDateTimeUTC(res.data.endDate, res.data.endTime, res.data.isAllDay)).format('HH:mm:ss');
+                        res.data.startTimeString = dayjs.isDayjs(res.data?.startTime) ? dayjs(res.data?.startTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${res.data.startDate} ${res.data?.startTime}`)).format(E_FormatDate.TimeEvent);
+                        res.data.endDateTimeString = dayjs.isDayjs(res.data?.endTime) ? dayjs(res.data?.endTime).format(E_FormatDate.TimeEvent) : dayjs(new Date(`${res.data.endDate} ${res.data?.endTime}`)).format(E_FormatDate.TimeEvent);
+                        setCurrentEvent(res.data);
+                    };
+                })
+                .finally(() => {
+                    setSubmitting(false);
+                });
+        }    
     };
 
 
@@ -354,8 +372,8 @@ const CalendarContent: FC<any> = (): JSX.Element => {
     };
 
     const parsingEvent = (data: CalendarEvent): EventInput => {
-        const start = combineDateTimeUTC(data.startDate, data.startTime, data.isAllDay).toString();
-        const end = combineDateTimeUTC(data.endDate, data.endTime, data.isAllDay).toString();
+        const start = combineDateTimeUTC(data.startDate, data.startTime, data.isAllDay, data.localTimeZone).toString();
+        const end = combineDateTimeUTC(data.endDate, data.endTime, data.isAllDay, data.localTimeZone).toString();
         var startDate = new Date(start);
         var endDate = new Date(end);
         if (data.isAllDay && endDate.getDate() != startDate.getDate()) {

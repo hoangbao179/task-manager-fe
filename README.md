@@ -1,7 +1,12 @@
 # Task Manager Frontend
 
 This is the frontend for the Task Manager application built with Next.js and TypeScript.
+Some features currently being implemented:
 
+- Create, edit, and delete calendar events using a button or by clicking on a date. If not logged in, only 3 calendar events can be created.
+Planned features:
+- Synchronization with Google Calendar
+- Notifications using Firebase
 ## Prerequisites
 
 - Node.js
